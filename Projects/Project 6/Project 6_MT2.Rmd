@@ -248,6 +248,9 @@ for (i in 1:100) {
   result_matrix[i, ] <- c(ATT, proportion_true)
 }
 
+
+
+
 # Plot ATT v. proportion
 result_df <- as.data.frame(result_matrix)
 subsample_df <- result_df[sample(nrow(result_df), 100), ]
@@ -347,12 +350,12 @@ model_ps <-                 # save logit model as an object
 
 # print summary
 summary(model_ps)
-
+df<-ypsps
 
 # predict
 # ---------
 df <-                                    # save over df dataframe object
-  ypsps %>%                                 # pass data 
+  df %>%                                 # pass data 
   mutate(prop_score = predict(model_ps)) # create a new variable that predicts propensity score based on logit model
 
 df_a0 <- df %>% filter(college == 0) # save anything under control as a dataframe
@@ -392,13 +395,17 @@ dists_ps
 treat <- c()   # create empty treatment vector
 control <- c() # create empty control vector
 df_a1_small_copy <- as.data.frame(df_a1_small) # create a copy to prevent overwrite within cell  
+#df_a1_small_copy <- df_a1_small # create a copy to prevent overwrite within cell  
+
 dists_ps_copy <- as.data.frame(dists_ps)       # create a copy to prevent overwrite within cell  
+#dists_ps_copy <- dists_ps    # create a copy to prevent overwrite within cell  
 
 # loop through to grab matches based on propensity scores
 # ---------
 for(i in 1:nrow(df_a1_small)) {
   max_treat <- which.max(df_a1_small_copy$prop_score)# %>% select(-ID)) # save max propensity score
-  treat[i] <- names(max_treat)                                          # add max_treat names
+  treat[i] <- names(max_treat)  
+  # add max_treat names
   df_a1_small_copy <- df_a1_small_copy %>% slice(-max_treat)            # remove it from the dataframe
   
   match_control <- which.min(dists_ps_copy[max_treat,])                 # find it's match in control
@@ -407,6 +414,8 @@ for(i in 1:nrow(df_a1_small)) {
       select(-match_control) %>%    
       slice(-max_treat)
 }
+
+
 
 # print
 # ---------
